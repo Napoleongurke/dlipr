@@ -24,7 +24,7 @@ def load_data():
     y_train, y_test = np.split(y, [22000])
 
     data = Dataset()
-    data.classes = temperatures
+    data.classes = np.around(temperatures, decimals=1)
     data.train_images = X_train
     data.train_labels = y_train
     data.test_images = X_test

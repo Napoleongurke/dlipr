@@ -35,30 +35,25 @@ def load_data():
             fname (str, optional): filename for saving the plot
         """
         fig, axes = plt.subplots(2, num_examples, figsize=(num_examples, 2))
-        for i, X in enumerate((self.train_images, self.train_images_noisy)):
+        for i, X in enumerate((self.X_train, self.Y_train)):
             for j in range(num_examples):
                 ax = axes[i, j]
-                ax.imshow(X[j, :, :, 0])
+                ax.imshow(X[j])
                 ax.set_xticks([])
                 ax.set_yticks([])
-        axes[0, 0].set_ylabel('unspeckled')
-        axes[1, 0].set_ylabel('speckled')
+        axes[0, 0].set_ylabel('speckled')
+        axes[1, 0].set_ylabel('unspeckled')
         maybe_savefig(fig, fname)
 
     fname = get_datapath('AutoEncoder/data.h5')
     fin = h5py.File(fname)['data']
 
-    def preprocess(A):
-        A = np.swapaxes(A, 0, 1)
-        A = np.log10(A + 0.01)
-        A /= np.max(A, axis=1, keepdims=True)
-        return np.reshape(A, (len(A), 64, 64, 1))
+    def format(X):
+        return np.swapaxes(X, 0, 1).reshape((-1, 64, 64))
 
-    speckle = preprocess(fin['speckle_images'])
-    normal = preprocess(fin['normal_images'])
+    speckle = format(fin['speckle_images'])
+    normal = format(fin['normal_images'])
 
-    data.train_images_noisy = speckle[:20000]
-    data.test_images_noisy = speckle[20000:]
-    data.train_images = normal[:20000]
-    data.test_images = normal[:20000]
+    data.X_train, data.X_test = np.split(speckle, [20000])
+    data.Y_train, data.Y_test = np.split(normal, [20000])
     return data
