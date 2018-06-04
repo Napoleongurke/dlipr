@@ -6,6 +6,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import json
 import os
+import tensorflow as tf
 
 
 def get_datapath(fname=''):
@@ -18,6 +19,13 @@ def get_datapath(fname=''):
     with open(os.path.join(cdir, '.env')) as handle:
         ddir = json.load(handle)['DATA_PATH']
         return os.path.join(ddir, fname)
+
+
+def get_session(gpu_fraction=0.45):
+    ''' Allocate only a fraction of the GPU RAM - (1080 GTX 8Gb),
+    required for present network setup'''
+    gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=gpu_fraction)
+    return tf.Session(config=tf.ConfigProto(gpu_options=gpu_options))
 
 
 class Dataset():
